@@ -6,52 +6,83 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **PsiAgenda** — a SaaS for Brazilian psychologists to manage their practice. Features include appointment scheduling, WhatsApp reminders, patient management, and AI-powered pre-consultation screening. All UI text is in Portuguese (pt-BR).
 
-## Current State
+## Tech Stack
 
-This is an early-stage MVP with two standalone React component files and a design spec document. There is no build system, package.json, backend, database, or test infrastructure yet.
+- **Backend**: Laravel 12, PHP 8.4
+- **Database**: SQLite (default, at `database/database.sqlite`)
+- **Frontend**: React JSX prototypes (pre-build-system), Vite
+- **Linting**: Laravel Pint (PHP-CS-Fixer wrapper)
+- **Testing**: PHPUnit 11
+- **Local dev**: Laravel Herd
 
-## Files
+## Commands
 
-- `psiagenda-v3.jsx` — Main application UI (dashboard, patients, messages, AI assistant configuration)
-- `psiagenda-landing.jsx` — Marketing landing page with pricing, FAQ, testimonials
-- `psiagenda-mvp-v3.docx` — Product specification document
+```bash
+# Development (starts server, queue, logs, and vite concurrently)
+composer dev
+
+# Run all tests
+composer test
+
+# Run a single test file
+php artisan test --filter=ExampleTest
+
+# Run a single test method
+php artisan test --filter=test_the_application_returns_a_successful_response
+
+# Lint/format PHP code
+./vendor/bin/pint
+
+# Run migrations
+php artisan migrate
+
+# Fresh migrate (drops all tables)
+php artisan migrate:fresh
+
+# Create a model with migration, factory, and seeder
+php artisan make:model Patient -mfs
+```
 
 ## Architecture
 
-### Design System
+### Laravel (Backend)
 
-Colors, statuses, and typography are defined as constants at the top of each file rather than in shared modules:
+Standard Laravel 12 structure:
+- `app/Models/` — Eloquent models
+- `app/Http/Controllers/` — Controllers
+- `app/Providers/` — Service providers
+- `routes/web.php` — Web routes
+- `routes/console.php` — Artisan commands
+- `database/migrations/` — Database migrations
+- `database/factories/` — Model factories for testing
+- `database/seeders/` — Database seeders
+- `tests/Feature/` — Feature tests (HTTP, integration)
+- `tests/Unit/` — Unit tests
+- `config/` — Configuration files (app, auth, database, etc.)
 
-- **`C` object** (`psiagenda-v3.jsx`): Design tokens — primary (#3571C5), accent (#1DAA7B), warning (#E8A817), danger (#D94848), AI (#7C3AED)
-- **`STATUS` object**: Session states — scheduled, confirmed, cancelled, completed, no_show (each with bg, text, dot, label)
-- **`MSG_STATUS` object**: WhatsApp message delivery states — read, delivered, sent, failed, pending
+### Frontend Prototypes
 
-All styling is **inline CSS** — no CSS files, no Tailwind, no styled-components.
+Standalone React component files from the initial MVP phase — not yet integrated into the Laravel/Vite build:
+- `psiagenda-v3.jsx` — Main app UI (dashboard, patients, messages, AI assistant)
+- `psiagenda-landing.jsx` — Marketing landing page
+- `psiagenda-mvp-v3.docx` — Product specification document
 
-### Component Patterns
+### Design System (from prototypes)
 
-Components use short single-letter or abbreviated names:
-- `I` — SVG icon system (24+ icons via `name` prop)
-- `WA` — WhatsApp icon
-- `Btn` — Button (variants: primary, outline, danger, ai)
-- `Badge`, `Toggle`, `Card`, `CardHeader`, `Sidebar` — UI primitives
+- **Colors**: primary (#3571C5), accent (#1DAA7B), warning (#E8A817), danger (#D94848), AI (#7C3AED)
+- **Session statuses**: scheduled, confirmed, cancelled, completed, no_show
+- **Message statuses**: read, delivered, sent, failed, pending
+- **Components use short names**: `I` (icons), `Btn` (button), `WA` (WhatsApp icon), `Badge`, `Toggle`, `Card`
 
 ### AI Assistant System
 
-The AI assistant is configurable across 5 therapeutic approaches, each with its own color, vocabulary (10-12 terms), sample questions, tone, and preview conversation:
-- TCC (Terapia Cognitivo-Comportamental)
-- Psicanálise
-- Abordagem Humanista
-- Terapia Sistêmica
-- Gestalt-terapia
-
-### Landing Page
-
-`psiagenda-landing.jsx` exports a single `LP` component. Uses Source Serif 4 + Outfit fonts. Three pricing tiers: Solo (R$69), Profissional (R$99), Consultório (R$179). Scroll-based animations via IntersectionObserver.
+Configurable across 5 therapeutic approaches, each with its own vocabulary, sample questions, tone, and color:
+TCC (CBT), Psicanálise, Abordagem Humanista, Terapia Sistêmica, Gestalt-terapia
 
 ## Key Conventions
 
-- Language: all user-facing strings are in Portuguese (pt-BR)
-- Healthcare compliance: LGPD references, AES-256 encryption mentions, CRP credential system
+- All user-facing strings in Portuguese (pt-BR)
+- Healthcare compliance: LGPD, AES-256 encryption for private notes
 - WhatsApp is the primary patient communication channel
-- Pricing in BRL (Brazilian Real)
+- Pricing in BRL (R$69/99/179 per month across 3 tiers)
+- CRP credential system (Brazilian psychology board)

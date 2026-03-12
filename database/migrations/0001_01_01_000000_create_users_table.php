@@ -6,19 +6,30 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
-            $table->id();
+        Schema::create('psychologists', function (Blueprint $table) {
+            $table->uuid('id')->primary();
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('phone', 20)->nullable();
+            $table->string('crp', 20)->nullable();
+            $table->string('timezone', 50)->default('America/Sao_Paulo');
+            $table->integer('session_duration')->default(50);
+            $table->integer('session_interval')->default(10);
+            $table->decimal('session_price', 10, 2)->default(0);
+            $table->string('therapeutic_approach')->default('tcc'); // tcc, psychoanalysis, humanistic, systemic, gestalt, other
+            $table->string('plan')->default('free'); // free, solo, professional, clinic
+            $table->timestamp('plan_expires_at')->nullable();
+            $table->json('fiscal_data')->nullable(); // encrypted at app level: CPF/CNPJ, address
+            $table->json('ai_settings')->nullable(); // approach, questions, instructions, templates
+            $table->json('settings')->nullable(); // general config (reminders, receipts, etc.)
+            $table->string('slug', 100)->unique();
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
@@ -27,9 +38,9 @@ return new class extends Migration
             $table->timestamp('created_at')->nullable();
         });
 
-        Schema::create('sessions', function (Blueprint $table) {
+        Schema::create('http_sessions', function (Blueprint $table) {
             $table->string('id')->primary();
-            $table->foreignId('user_id')->nullable()->index();
+            $table->foreignUuid('user_id')->nullable()->index();
             $table->string('ip_address', 45)->nullable();
             $table->text('user_agent')->nullable();
             $table->longText('payload');
@@ -37,13 +48,10 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('psychologists');
         Schema::dropIfExists('password_reset_tokens');
-        Schema::dropIfExists('sessions');
+        Schema::dropIfExists('http_sessions');
     }
 };
