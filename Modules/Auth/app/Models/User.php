@@ -43,6 +43,8 @@ class User extends Authenticatable
         'plan',
         'plan_expires_at',
         'fiscal_data',
+        'photo',
+        'bio',
         'ai_settings',
         'settings',
         'slug',

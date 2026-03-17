@@ -3,54 +3,55 @@
 namespace Modules\Patient\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Modules\Patient\Actions\DeletePatientAction;
+use Modules\Patient\Actions\ListPatientsAction;
+use Modules\Patient\Actions\ShowPatientAction;
+use Modules\Patient\Actions\StorePatientAction;
+use Modules\Patient\Actions\UpdatePatientAction;
+use Modules\Patient\Http\Requests\StorePatientRequest;
+use Modules\Patient\Http\Requests\UpdatePatientRequest;
 
 class PatientController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(Request $request, ListPatientsAction $action): JsonResponse
     {
-        return view('patient::index');
+        $patients = $action->execute(
+            user: $request->user(),
+            search: $request->query('search'),
+            isActive: $request->has('is_active') ? filter_var($request->query('is_active'), FILTER_VALIDATE_BOOLEAN) : null,
+            perPage: (int) $request->query('per_page', 15),
+        );
+
+        return response()->json($patients);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(StorePatientRequest $request, StorePatientAction $action): JsonResponse
     {
-        return view('patient::create');
+        $patient = $action->execute($request->user(), $request->getData());
+
+        return response()->json(['patient' => $patient], 201);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request) {}
-
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
+    public function show(Request $request, string $id, ShowPatientAction $action): JsonResponse
     {
-        return view('patient::show');
+        $patient = $action->execute($request->user(), $id);
+
+        return response()->json(['patient' => $patient]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
+    public function update(UpdatePatientRequest $request, string $id, UpdatePatientAction $action): JsonResponse
     {
-        return view('patient::edit');
+        $patient = $action->execute($request->user(), $id, $request->getData());
+
+        return response()->json(['patient' => $patient]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id) {}
+    public function destroy(Request $request, string $id, DeletePatientAction $action): JsonResponse
+    {
+        $action->execute($request->user(), $id);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id) {}
+        return response()->json(null, 204);
+    }
 }

@@ -22,6 +22,11 @@ class Patient extends Model
     /** @use HasFactory<PatientFactory> */
     use HasFactory, HasUuids, SoftDeletes;
 
+    protected static function newFactory(): PatientFactory
+    {
+        return PatientFactory::new();
+    }
+
     protected $fillable = [
         'psychologist_id',
         'name',

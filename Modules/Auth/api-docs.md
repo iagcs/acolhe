@@ -142,3 +142,91 @@ Creates a new psychologist account with availabilities and returns a Sanctum API
   }
 }
 ```
+
+---
+
+## PATCH /api/v1/profile
+
+Updates the authenticated psychologist's profile (photo and/or bio).
+
+**Auth:** Bearer token (Sanctum)
+
+### Request
+
+Multipart form data or JSON:
+
+```json
+{
+  "bio": "Psicóloga especializada em TCC com 10 anos de experiência."
+}
+```
+
+For photo upload, send as `multipart/form-data` with an `image` file in the `photo` field.
+
+### Validation Rules
+
+| Field   | Rules                        |
+|---------|------------------------------|
+| `photo` | nullable, image, max:2048 KB |
+| `bio`   | nullable, string, max:1000   |
+
+### Success Response (200)
+
+```json
+{
+  "user": {
+    "id": "uuid",
+    "name": "Dr. João Silva",
+    "photo": "photos/abc123.jpg",
+    "bio": "Psicóloga especializada em TCC com 10 anos de experiência.",
+    "..."
+  }
+}
+```
+
+### Error Response (422)
+
+```json
+{
+  "message": "The photo field must be an image.",
+  "errors": {
+    "photo": ["The photo field must be an image."]
+  }
+}
+```
+
+---
+
+## GET /api/v1/onboarding/status
+
+Returns the onboarding state for the authenticated psychologist.
+
+**Auth:** Bearer token (Sanctum)
+
+### Success Response (200)
+
+```json
+{
+  "has_photo": false,
+  "has_bio": false,
+  "patient_count": 0,
+  "session_count": 0,
+  "dismissed": false
+}
+```
+
+---
+
+## PATCH /api/v1/onboarding/dismiss
+
+Marks onboarding as dismissed for the authenticated psychologist. Idempotent.
+
+**Auth:** Bearer token (Sanctum)
+
+### Success Response (200)
+
+```json
+{
+  "dismissed": true
+}
+```

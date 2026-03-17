@@ -3,7 +3,10 @@
 namespace Modules\Session\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Modules\Session\Actions\StoreSessionAction;
+use Modules\Session\Http\Requests\StoreSessionRequest;
 
 class SessionController extends Controller
 {
@@ -26,7 +29,12 @@ class SessionController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request) {}
+    public function store(StoreSessionRequest $request, StoreSessionAction $action): JsonResponse
+    {
+        $session = $action->execute($request->user(), $request->getData());
+
+        return response()->json(['session' => $session], 201);
+    }
 
     /**
      * Show the specified resource.
