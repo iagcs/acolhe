@@ -1,0 +1,19 @@
+{
+    "Core": true,
+    "Auth": true,
+    "Agenda": true,
+    "Patient": true,
+    "Session": true,
+    "Reminder": true,
+    "Confirmation": true,
+    "WaitingList": true,
+    "WhatsApp": true,
+    "AIScreening": true,
+    "Booking": true,
+    "Document": true,
+    "Receipt": true,
+    "Billing": true,
+    "Report": true,
+    "RiskScore": true,
+    "Notification": true
+}

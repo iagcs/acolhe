@@ -1,0 +1,30 @@
+{
+    "name": "nwidart/agenda",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Agenda\\": "app/",
+            "Modules\\Agenda\\Database\\Factories\\": "database/factories/",
+            "Modules\\Agenda\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\Agenda\\Tests\\": "tests/"
+        }
+    }
+}

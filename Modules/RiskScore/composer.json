@@ -1,0 +1,30 @@
+{
+    "name": "nwidart/riskscore",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\RiskScore\\": "app/",
+            "Modules\\RiskScore\\Database\\Factories\\": "database/factories/",
+            "Modules\\RiskScore\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\RiskScore\\Tests\\": "tests/"
+        }
+    }
+}
