@@ -1,0 +1,11 @@
+{
+    "name": "AIScreening",
+    "alias": "aiscreening",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\AIScreening\\Providers\\AIScreeningServiceProvider"
+    ],
+    "files": []
+}

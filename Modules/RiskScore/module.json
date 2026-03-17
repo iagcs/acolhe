@@ -1,0 +1,11 @@
+{
+    "name": "RiskScore",
+    "alias": "riskscore",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\RiskScore\\Providers\\RiskScoreServiceProvider"
+    ],
+    "files": []
+}

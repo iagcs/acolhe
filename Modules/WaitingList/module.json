@@ -1,0 +1,11 @@
+{
+    "name": "WaitingList",
+    "alias": "waitinglist",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\WaitingList\\Providers\\WaitingListServiceProvider"
+    ],
+    "files": []
+}
