@@ -4,13 +4,14 @@ namespace Modules\Patient\Actions;
 
 use Modules\Auth\Models\User;
 use Modules\Patient\DTOs\PatientData;
+use Modules\Patient\Events\PatientCreated;
 use Modules\Patient\Models\Patient;
 
 class StorePatientAction
 {
     public function execute(User $user, PatientData $data): Patient
     {
-        return $user->patients()->create([
+        $patient = $user->patients()->create([
             'name' => $data->name,
             'email' => $data->email,
             'phone' => $data->phone,
@@ -18,5 +19,9 @@ class StorePatientAction
             'notes' => $data->notes,
             'is_active' => true,
         ]);
+
+        PatientCreated::dispatch($patient);
+
+        return $patient;
     }
 }

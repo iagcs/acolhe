@@ -4,6 +4,7 @@ namespace Modules\Patient\Actions;
 
 use Modules\Auth\Models\User;
 use Modules\Patient\DTOs\UpdatePatientData;
+use Modules\Patient\Events\PatientUpdated;
 use Modules\Patient\Models\Patient;
 
 class UpdatePatientAction
@@ -18,6 +19,10 @@ class UpdatePatientAction
 
         $patient->update($data->toArray());
 
-        return $patient->refresh();
+        $patient->refresh();
+
+        PatientUpdated::dispatch($patient);
+
+        return $patient;
     }
 }

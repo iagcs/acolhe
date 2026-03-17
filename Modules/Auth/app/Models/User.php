@@ -48,6 +48,7 @@ class User extends Authenticatable
         'ai_settings',
         'settings',
         'slug',
+        'calendar_token',
     ];
 
     protected $hidden = [
