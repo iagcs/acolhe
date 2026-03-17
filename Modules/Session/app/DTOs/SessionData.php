@@ -10,7 +10,7 @@ class SessionData extends Data
         public string $patient_id,
         public string $scheduled_at,
         public int $duration_minutes = 50,
-        public string $type = 'online',
+        public string $type = 'in_person',
         public ?string $notes = null,
     ) {}
 }

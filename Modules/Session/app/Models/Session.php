@@ -2,6 +2,7 @@
 
 namespace Modules\Session\Models;
 
+use Database\Factories\SessionFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -13,10 +14,16 @@ use Modules\Billing\Models\Payment;
 use Modules\Patient\Models\Patient;
 use Modules\Receipt\Models\Receipt;
 use Modules\Reminder\Models\Reminder;
+use Modules\Session\Enums\SessionStatus;
 
 class Session extends Model
 {
     use HasFactory, HasUuids;
+
+    protected static function newFactory(): SessionFactory
+    {
+        return SessionFactory::new();
+    }
 
     protected $fillable = [
         'psychologist_id',
@@ -46,6 +53,9 @@ class Session extends Model
             'confirmation_responded_at' => 'datetime',
             'price' => 'decimal:2',
             'receipt_sent' => 'boolean',
+            'reschedule_count' => 'integer',
+            'status' => SessionStatus::class,
+            'private_notes' => 'encrypted',
         ];
     }
 

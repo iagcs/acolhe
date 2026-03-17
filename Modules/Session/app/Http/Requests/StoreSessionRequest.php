@@ -3,7 +3,9 @@
 namespace Modules\Session\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use Modules\Session\DTOs\SessionData;
+use Modules\Session\Rules\NoOverlappingSession;
 use Spatie\LaravelData\WithData;
 
 class StoreSessionRequest extends FormRequest
@@ -20,8 +22,17 @@ class StoreSessionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'patient_id' => ['required', 'uuid', 'exists:patients,id'],
-            'scheduled_at' => ['required', 'date', 'after:now'],
+            'patient_id' => [
+                'required',
+                'uuid',
+                Rule::exists('patients', 'id')->where('psychologist_id', $this->user()->id),
+            ],
+            'scheduled_at' => [
+                'required',
+                'date',
+                'after:now',
+                new NoOverlappingSession(userId: $this->user()->id),
+            ],
             'duration_minutes' => ['sometimes', 'integer', 'min:15', 'max:180'],
             'type' => ['required', 'in:online,in_person'],
             'notes' => ['nullable', 'string'],
