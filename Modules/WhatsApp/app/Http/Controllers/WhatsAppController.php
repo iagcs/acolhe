@@ -3,54 +3,57 @@
 namespace Modules\WhatsApp\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Modules\WhatsApp\Models\WhatsAppConversation;
+use Modules\WhatsApp\Services\EvolutionApiClient;
 
+/**
+ * Authenticated management endpoints for the psychologist dashboard.
+ */
 class WhatsAppController extends Controller
 {
+    public function __construct(
+        private readonly EvolutionApiClient $client,
+    ) {}
+
     /**
-     * Display a listing of the resource.
+     * GET /api/v1/whatsapp/status
+     * Returns the Evolution API connection status for the psychologist's instance.
      */
-    public function index()
+    public function status(): JsonResponse
     {
-        return view('whatsapp::index');
+        $data = $this->client->getConnectionStatus();
+
+        return response()->json(['status' => $data]);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * POST /api/v1/whatsapp/connect
+     * Returns a QR code payload to connect a new WhatsApp number.
      */
-    public function create()
+    public function connect(): JsonResponse
     {
-        return view('whatsapp::create');
+        $data = $this->client->getQrCode();
+
+        return response()->json(['qr' => $data]);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * GET /api/v1/whatsapp/conversations
+     * Lists recent conversations for the authenticated psychologist.
      */
-    public function store(Request $request) {}
-
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
+    public function conversations(Request $request): JsonResponse
     {
-        return view('whatsapp::show');
+        /** @var \Modules\Auth\Models\User $user */
+        $user = $request->user();
+
+        $conversations = WhatsAppConversation::where('psychologist_id', $user->id)
+            ->with('patient:id,name,phone')
+            ->orderByDesc('last_message_at')
+            ->limit(50)
+            ->get(['id', 'phone', 'patient_id', 'state', 'last_message_at']);
+
+        return response()->json(['conversations' => $conversations]);
     }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
-    {
-        return view('whatsapp::edit');
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id) {}
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id) {}
 }

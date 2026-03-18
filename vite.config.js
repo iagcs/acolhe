@@ -11,6 +11,8 @@ export default defineConfig({
         tailwindcss(),
     ],
     server: {
+        host: true,
+        allowedHosts: ['ernest-voltametric-florinda.ngrok-free.dev'],
         watch: {
             ignored: ['**/storage/framework/views/**'],
         },

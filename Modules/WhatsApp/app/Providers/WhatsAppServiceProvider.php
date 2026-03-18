@@ -36,6 +36,8 @@ class WhatsAppServiceProvider extends ServiceProvider
     {
         $this->app->register(EventServiceProvider::class);
         $this->app->register(RouteServiceProvider::class);
+
+        $this->registerWhatsAppBindings();
     }
 
     /**
@@ -43,7 +45,10 @@ class WhatsAppServiceProvider extends ServiceProvider
      */
     protected function registerCommands(): void
     {
-        // $this->commands([]);
+        $this->commands([
+            \Modules\WhatsApp\Console\Commands\WhatsAppHealthCheckCommand::class,
+            \Modules\WhatsApp\Console\Commands\ConversationGarbageCollectCommand::class,
+        ]);
     }
 
     /**
@@ -51,10 +56,39 @@ class WhatsAppServiceProvider extends ServiceProvider
      */
     protected function registerCommandSchedules(): void
     {
-        // $this->app->booted(function () {
-        //     $schedule = $this->app->make(Schedule::class);
-        //     $schedule->command('inspire')->hourly();
-        // });
+        $this->app->booted(function () {
+            $schedule = $this->app->make(\Illuminate\Console\Scheduling\Schedule::class);
+            $schedule->command('whatsapp:health-check')->everyTenMinutes();
+            $schedule->command('whatsapp:gc-conversations')->daily();
+        });
+    }
+
+    /**
+     * Register AI-ready bindings.
+     *
+     * Conversation handlers are registered here in priority order.
+     * To swap a structured flow for an AI-powered one, change the binding
+     * in this method only — no other code changes required.
+     */
+    protected function registerWhatsAppBindings(): void
+    {
+        // Singleton services
+        $this->app->singleton(\Modules\WhatsApp\Services\EvolutionApiClient::class);
+        $this->app->singleton(\Modules\WhatsApp\Services\SlotFinderService::class);
+
+        // Handler chain — order matters (first match wins)
+        $this->app->singleton(
+            \Modules\WhatsApp\Services\ConversationStateMachine::class,
+            function ($app) {
+                return new \Modules\WhatsApp\Services\ConversationStateMachine([
+                    $app->make(\Modules\WhatsApp\Flows\ConfirmationFlow::class),  // 1. Pending confirmations
+                    $app->make(\Modules\WhatsApp\Flows\RescheduleFlow::class),    // 2. Reschedule requests
+                    $app->make(\Modules\WhatsApp\Flows\OnboardingFlow::class),    // 3. New patients
+                    $app->make(\Modules\WhatsApp\Flows\BookingFlow::class),       // 4. Booking intent
+                    $app->make(\Modules\WhatsApp\Flows\HelpFlow::class),          // 5. Fallback
+                ]);
+            }
+        );
     }
 
     /**
